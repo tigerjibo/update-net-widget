@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,6 +127,13 @@ void process_netlink_msg(char *msg, int len)
     }
 }
 
+void sig_handler(int signo)
+{
+    if (signo == SIGHUP) {
+        update_widget();
+    }
+}
+
 int main(int argc, char *argv[])
 {
     struct sockaddr_nl addr;
@@ -133,6 +141,10 @@ int main(int argc, char *argv[])
     char buffer[4096];
 
     init_if_structures();
+
+    if (signal(SIGHUP, sig_handler) == SIG_ERR) {
+        perror("Can't catch SIGHUP");
+    }
 
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;
