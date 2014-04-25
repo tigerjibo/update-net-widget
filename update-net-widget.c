@@ -107,6 +107,7 @@ void process_netlink_msg(char *msg, int len)
                 || nlh->nlmsg_type == RTM_DELADDR) {
             struct ifaddrmsg *ifa = (struct ifaddrmsg *) NLMSG_DATA(nlh);
             if (ifa->ifa_index != 1
+                    && ifa->ifa_family == AF_INET
                     && ifa->ifa_scope == RT_SCOPE_UNIVERSE) {
                 int if_index = ifa->ifa_index - 2;
                 if (nlh->nlmsg_type == RTM_NEWADDR) {
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
 
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;
-    addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR;
+    addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
 
     if ((sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1) {
         perror("Couldn't open NETLINK_ROUTE socket");
