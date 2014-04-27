@@ -87,18 +87,12 @@ void process_netlink_msg(char *msg, int len)
             struct ifinfomsg *ifi = (struct ifinfomsg *) NLMSG_DATA(nlh);
             if (ifi->ifi_index != 1) {
                 int if_index = ifi->ifi_index - 2;
-                if (ifi->ifi_flags & IFF_UP
-                        && ifi->ifi_flags & IFF_RUNNING
-                        && ifi->ifi_flags & IFF_LOWER_UP) {
-                    if (!ifs_link_up[if_index]) {
-                        ifs_link_up[if_index] = true;
-                        update_widget();
-                    }
-                } else {
-                    if (ifs_link_up[if_index]) {
-                        ifs_link_up[if_index] = false;
-                        update_widget();
-                    }
+                bool if_up = ifi->ifi_flags & IFF_UP
+                    && ifi->ifi_flags & IFF_RUNNING
+                    && ifi->ifi_flags & IFF_LOWER_UP;
+                if (ifs_link_up[if_index] != if_up) {
+                    ifs_link_up[if_index] = if_up;
+                    update_widget();
                 }
             }
         }
